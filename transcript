@@ -1,0 +1,110 @@
+# //  Questa Sim-64
+# //  Version 2025.3 linux_x86_64 Sep 15 2025
+# //
+# // Unpublished work. Copyright 2025 Siemens
+# //
+# // This material contains trade secrets or otherwise confidential information
+# // owned by Siemens Industry Software Inc. or its affiliates (collectively,
+# // "SISW"), or its licensors. Access to and use of this information is strictly
+# // limited as set forth in the Customer's applicable agreements with SISW.
+# //
+# // This material may not be copied, distributed, or otherwise disclosed outside
+# // of the Customer's facilities without the express written permission of SISW,
+# // and may not be used in any way not expressly authorized by SISW.
+# //
+
+
+
+do script.do
+# apagando biblioteca WORK...
+# recriando biblioteca WORK...
+#  
+# QuestaSim-64 vcom 2025.3 Compiler 2025.09 Sep 15 2025
+# Start time: 22:20:35 on May 08,2026
+# vcom -reportprogress 300 ./ps2_driver.vhd 
+# ** Note: (vcom-220) '/soft64/mentor/ferramentas/questa/2025.3/questasim/linux_x86_64/../modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ps2_driver
+# -- Compiling architecture rtl of ps2_driver
+# End time: 22:20:35 on May 08,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vcom 2025.3 Compiler 2025.09 Sep 15 2025
+# Start time: 22:20:36 on May 08,2026
+# vcom -reportprogress 300 ./ps2_driver_tb.vhd 
+# ** Note: (vcom-220) '/soft64/mentor/ferramentas/questa/2025.3/questasim/linux_x86_64/../modelsim.ini' is used as the ini file.
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity ps2_driver_tb
+# -- Compiling architecture sim of ps2_driver_tb
+# -- Loading entity ps2_driver
+# ** Error: ./ps2_driver_tb.vhd(60): (vcom-1484) Unknown formal identifier "clock_in".
+# ** Error: ./ps2_driver_tb.vhd(61): (vcom-1484) Unknown formal identifier "reset_in".
+# ** Error: ./ps2_driver_tb.vhd(62): (vcom-1484) Unknown formal identifier "clock_ps2".
+# ** Error: ./ps2_driver_tb.vhd(63): (vcom-1484) Unknown formal identifier "data_ps2".
+# ** Error: ./ps2_driver_tb.vhd(64): (vcom-1484) Unknown formal identifier "data_p".
+# ** Error: ./ps2_driver_tb.vhd(65): (vcom-1484) Unknown formal identifier "data_p_en".
+# ** Error: ./ps2_driver_tb.vhd(71): Illegal target for signal assignment.
+# ** Error: ./ps2_driver_tb.vhd(71): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(73): Illegal target for signal assignment.
+# ** Error: ./ps2_driver_tb.vhd(73): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(83): Illegal target for signal assignment.
+# ** Error: ./ps2_driver_tb.vhd(83): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(85): Illegal target for signal assignment.
+# ** Error: ./ps2_driver_tb.vhd(85): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(94): Illegal target for signal assignment.
+# ** Error: ./ps2_driver_tb.vhd(94): (vcom-1136) Unknown identifier "rst".
+# ** Error: ./ps2_driver_tb.vhd(98): Illegal target for signal assignment.
+# ** Error: ./ps2_driver_tb.vhd(98): (vcom-1136) Unknown identifier "rst".
+# ** Error: ./ps2_driver_tb.vhd(100): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(100): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(101): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(101): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(103): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(103): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(105): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(105): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(106): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(106): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(107): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(107): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(109): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(109): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(110): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(110): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(112): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(112): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(113): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(113): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(114): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(114): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(115): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(115): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(116): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(116): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(117): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(117): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(119): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(119): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(120): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(120): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(121): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(121): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(123): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(123): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(124): (vcom-1136) Unknown identifier "clk".
+# ** Error: ./ps2_driver_tb.vhd(124): (vcom-1136) Unknown identifier "data_sr".
+# ** Error: ./ps2_driver_tb.vhd(126): (vcom-1136) Unknown identifier "clk".
+# ** Warning: ./ps2_driver_tb.vhd(126): Wait statement has no sensitivity list or time out clause.
+# ** Note: ./ps2_driver_tb.vhd(126): VHDL Compiler exiting
+# End time: 22:20:36 on May 08,2026, Elapsed time: 0:00:00
+# Errors: 57, Warnings: 1
+# ** Error: /soft64/mentor/ferramentas/questa/2025.3/questasim/linux_x86_64/vcom failed.
+# Error in macro ./script.do line 15
+# /soft64/mentor/ferramentas/questa/2025.3/questasim/linux_x86_64/vcom failed.
+#     while executing
+# "vcom	./ps2_driver_tb.vhd"
