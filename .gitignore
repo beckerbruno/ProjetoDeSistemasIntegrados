@@ -1,0 +1,8 @@
+# Arquivos gerados pelo ModelSim
+work/
+transcript
+vsim.wlf
+*.wlf
+
+# macOS
+.DS_Store

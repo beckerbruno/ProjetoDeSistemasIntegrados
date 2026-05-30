@@ -3,137 +3,107 @@ USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
 ENTITY ps2_driver IS
-	PORT (
-		clk : IN STD_LOGIC;
-		rst : IN STD_LOGIC;
-		data_sr : IN STD_LOGIC;
-		data_pl : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-		data_pl_en : OUT STD_LOGIC;
-		sync : OUT STD_LOGIC
-	);
+    PORT (
+        clock_in  : IN  STD_LOGIC;
+        reset_in  : IN  STD_LOGIC;
+        clock_ps2 : IN  STD_LOGIC;
+        data_ps2  : IN  STD_LOGIC;
+        data_p    : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        data_p_en : OUT STD_LOGIC
+    );
 END ENTITY ps2_driver;
 
 ARCHITECTURE rtl OF ps2_driver IS
 
-	CONSTANT ALIGN_WORD : STD_LOGIC_VECTOR(7 DOWNTO 0) := x"A5";
-	CONSTANT PAYLOAD_BYTES : INTEGER := 5;
-	CONSTANT SYNC_THRESHOLD : INTEGER := 3;
+    -- Sincronizadores para o dominio de clock_in (100 MHz)
+    -- 3 estagios para clock_ps2 (deteccao de borda), 2 para data_ps2
+    SIGNAL clk_sync : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL dat_sync : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
-	TYPE state_t IS (
-		S_HUNT,
-		S_CHECK,
-		S_LOCKED
-	);
-	SIGNAL state : state_t;
+    -- Borda de descida do clock PS/2 detectada no dominio clock_in
+    SIGNAL ps2_fall : STD_LOGIC;
 
-	SIGNAL shift_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
-	SIGNAL bit_cnt : unsigned(2 DOWNTO 0);
-	SIGNAL byte_cnt : unsigned(2 DOWNTO 0);
-	SIGNAL align_cnt : unsigned(1 DOWNTO 0);
-
-	SIGNAL byte_done : STD_LOGIC;
-	SIGNAL is_align : STD_LOGIC;
-
-	SIGNAL data_pl_r : STD_LOGIC_VECTOR(7 DOWNTO 0);
-	SIGNAL data_pl_en_r : STD_LOGIC;
-	SIGNAL sync_r : STD_LOGIC;
+    TYPE state_t IS (IDLE, RECV_DATA, RECV_PARITY, RECV_STOP);
+    SIGNAL state   : state_t;
+    SIGNAL bit_cnt : unsigned(2 DOWNTO 0);
+    SIGNAL rx_data : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL rx_par  : STD_LOGIC;
 
 BEGIN
 
-	data_pl <= data_pl_r;
-	data_pl_en <= data_pl_en_r;
-	sync <= sync_r;
+    -- Sincronizacao dos sinais PS/2 no dominio de clock_in
+    sync_proc : PROCESS (clock_in, reset_in)
+    BEGIN
+        IF reset_in = '1' THEN
+            clk_sync <= (OTHERS => '1');
+            dat_sync <= (OTHERS => '1');
+        ELSIF rising_edge(clock_in) THEN
+            clk_sync <= clk_sync(1 DOWNTO 0) & clock_ps2;
+            dat_sync <= dat_sync(0) & data_ps2;
+        END IF;
+    END PROCESS;
 
-	shift_register : PROCESS (clk, rst)
-	BEGIN
-		IF rst = '1' THEN
-			shift_reg <= (OTHERS => '0');
-		ELSIF rising_edge(clk) THEN
-			shift_reg <= shift_reg(6 DOWNTO 0) & data_sr;
-		END IF;
-	END PROCESS;
+    -- clk_sync(2)=amostra de 2 ciclos atras, clk_sync(1)=1 ciclo atras
+    -- borda de descida: era '1', ficou '0'
+    ps2_fall <= clk_sync(2) AND NOT clk_sync(1);
 
-	bit_counter : PROCESS (clk, rst)
-	BEGIN
-		IF rst = '1' THEN
-			bit_cnt <= (OTHERS => '0');
-			byte_done <= '0';
-		ELSIF rising_edge(clk) THEN
-			byte_done <= '0';
-			IF bit_cnt = 7 THEN
-				bit_cnt <= (OTHERS => '0');
-				byte_done <= '1';
-			ELSE
-				bit_cnt <= bit_cnt + 1;
-			END IF;
-		END IF;
-	END PROCESS;
+    -- FSM: recebe frame PS/2 = start(0) + bit0..bit7 + paridade_impar + stop(1)
+    -- Os dados sao amostrados na borda de descida do clock PS/2
+    -- data_p_en fica em '1' por exatamente 1 ciclo de clock_in apos frame valido
+    fsm_proc : PROCESS (clock_in, reset_in)
+    BEGIN
+        IF reset_in = '1' THEN
+            state     <= IDLE;
+            bit_cnt   <= (OTHERS => '0');
+            rx_data   <= (OTHERS => '0');
+            rx_par    <= '0';
+            data_p    <= (OTHERS => '0');
+            data_p_en <= '0';
+        ELSIF rising_edge(clock_in) THEN
+            data_p_en <= '0';
 
-	is_align <= '1' WHEN shift_reg = ALIGN_WORD 
-		ELSE 	'0';
+            CASE state IS
 
-	fsm_proc : PROCESS (clk, rst)
-	BEGIN
-		IF rst = '1' THEN
-			state <= S_HUNT;
-			byte_cnt <= (OTHERS => '0');
-			align_cnt <= (OTHERS => '0');
-			data_pl_r <= (OTHERS => '0');
-			data_pl_en_r <= '0';
-			sync_r <= '0';
-		ELSIF rising_edge(clk) THEN
-			data_pl_en_r <= '0';
+                WHEN IDLE =>
+                    bit_cnt <= (OTHERS => '0');
+                    -- Aguarda borda de descida PS/2 com dado = '0' (start bit)
+                    IF ps2_fall = '1' AND dat_sync(1) = '0' THEN
+                        state <= RECV_DATA;
+                    END IF;
 
-			CASE state IS
+                WHEN RECV_DATA =>
+                    IF ps2_fall = '1' THEN
+                        -- PS/2 envia LSB primeiro; shift-right acumula LSB em rx_data(0)
+                        rx_data <= dat_sync(1) & rx_data(7 DOWNTO 1);
+                        IF bit_cnt = 7 THEN
+                            state <= RECV_PARITY;
+                        ELSE
+                            bit_cnt <= bit_cnt + 1;
+                        END IF;
+                    END IF;
 
-				WHEN S_HUNT => sync_r <= '0';
-					byte_cnt <= (OTHERS => '0');
-					align_cnt <= (OTHERS => '0');
+                WHEN RECV_PARITY =>
+                    IF ps2_fall = '1' THEN
+                        rx_par <= dat_sync(1);
+                        state  <= RECV_STOP;
+                    END IF;
 
-					IF byte_done = '1' THEN
-						IF is_align = '1' THEN
-							state <= S_CHECK;
-							align_cnt <= to_unsigned(1, align_cnt'length);
-						END IF;
-					END IF;
+                WHEN RECV_STOP =>
+                    IF ps2_fall = '1' THEN
+                        -- Valida stop bit = '1' e paridade impar
+                        -- Paridade impar: XOR(dados) XOR paridade = '1'
+                        IF dat_sync(1) = '1' AND
+                           (rx_data(0) XOR rx_data(1) XOR rx_data(2) XOR rx_data(3) XOR
+                            rx_data(4) XOR rx_data(5) XOR rx_data(6) XOR rx_data(7) XOR
+                            rx_par) = '1' THEN
+                            data_p    <= rx_data;
+                            data_p_en <= '1';
+                        END IF;
+                        state <= IDLE;
+                    END IF;
 
-				WHEN S_CHECK => sync_r <= '0';
-					IF byte_done = '1' THEN
-						IF byte_cnt = to_unsigned(PAYLOAD_BYTES, byte_cnt'length) THEN
-							byte_cnt <= (OTHERS => '0');
-							IF is_align = '1' THEN
-								align_cnt <= align_cnt + 1;
-								IF align_cnt = to_unsigned(SYNC_THRESHOLD - 1, align_cnt'length) THEN
-									state <= S_LOCKED;
-									sync_r <= '1';
-								END IF;
-							ELSE
-								state <= S_HUNT;
-								align_cnt <= (OTHERS => '0');
-							END IF;
-						ELSE
-							byte_cnt <= byte_cnt + 1;
-						END IF;
-					END IF;
-
-				WHEN S_LOCKED => sync_r <= '1';
-					IF byte_done = '1' THEN
-						IF byte_cnt = to_unsigned(PAYLOAD_BYTES, byte_cnt'length) THEN
-							byte_cnt <= (OTHERS => '0');
-							IF is_align = '0' THEN
-								state <= S_HUNT;
-								align_cnt <= (OTHERS => '0');
-								sync_r <= '0';
-							END IF;
-						ELSE
-							data_pl_r <= shift_reg;
-							data_pl_en_r <= '1';
-							byte_cnt <= byte_cnt + 1;
-						END IF;
-					END IF;
-
-			END CASE;
-		END IF;
-	END PROCESS;
+            END CASE;
+        END IF;
+    END PROCESS;
 
 END ARCHITECTURE rtl;
