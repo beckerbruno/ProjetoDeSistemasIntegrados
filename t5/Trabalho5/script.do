@@ -11,12 +11,12 @@ if {! [ file exists work ] } {
 }
 
 ## comandos de compilacao (ordem de dependencia: folhas -> uart_rx -> testbench).
-vcom	./src/sync.vhd
-vcom	./src/baud_gen.vhd
-vcom	./src/shift_reg.vhd
-vcom	./src/fsm_ctrl.vhd
-vcom	./src/uart_rx.vhd
-vcom	./sim/uart_rx_tb.vhd
+vcom	./sync.vhd
+vcom	./baud_gen.vhd
+vcom	./shift_reg.vhd
+vcom	./fsm_ctrl.vhd
+vcom	./uart_rx.vhd
+vcom	./uart_rx_tb.vhd
 
 ## comando de simulacao
 vsim -voptargs=+acc -wlfdeleteonquit work.uart_rx_tb

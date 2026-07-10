@@ -1,20 +1,14 @@
 -------------------------------------------------------------------------------
 -- uart_rx.vhd
--- Modulo TOP do receptor UART (Trabalho 5).
--- Conecta estruturalmente os sub-modulos: sync, baud_gen, shift_reg e fsm_ctrl.
---
---   clock_in / reset_in ---------------------------> todos os submodulos
---   uart_data_rx --[sync]--> rx_sync --> fsm_ctrl / shift_reg
---   uart_rate_rx_sel --[baud_gen]--> tick16 --> fsm_ctrl
---   fsm_ctrl --(shift/load)--> shift_reg --> data_p_out
---   fsm_ctrl --(en)---------------------------------> data_p_en_out
+-- Modulo TOP do receptor UART: conexao estrutural dos submodulos
+-- sync, baud_gen, shift_reg e fsm_ctrl.
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 
 entity uart_rx is
   port (
-    clock_in         : in  std_logic;                     -- referencia de clock master (100 MHz)
+    clock_in         : in  std_logic;                     -- clock master (100 MHz)
     reset_in         : in  std_logic;                     -- reset sincrono
     uart_data_rx     : in  std_logic;                     -- dado serial de entrada
     uart_rate_rx_sel : in  std_logic_vector(1 downto 0);  -- selecao da taxa de recepcao
@@ -25,9 +19,6 @@ end entity uart_rx;
 
 architecture structural of uart_rx is
 
-  ---------------------------------------------------------------------------
-  -- Declaracao dos componentes
-  ---------------------------------------------------------------------------
   component sync is
     port (
       clock_in : in  std_logic;
@@ -67,18 +58,12 @@ architecture structural of uart_rx is
     );
   end component;
 
-  ---------------------------------------------------------------------------
-  -- Sinais internos (ver diagrama de blocos)
-  ---------------------------------------------------------------------------
-  signal rx_sync_s   : std_logic;   -- saida do sincronizador
-  signal tick16_s    : std_logic;   -- pulso de oversampling 16x
-  signal shift_s     : std_logic;   -- comando de shift da FSM p/ shift_reg
+  signal rx_sync_s : std_logic;   -- saida do sincronizador
+  signal tick16_s  : std_logic;   -- pulso de oversampling 16x
+  signal shift_s   : std_logic;   -- comando de shift da FSM
 
 begin
 
-  ---------------------------------------------------------------------------
-  -- Instanciacao / wiring estrutural
-  ---------------------------------------------------------------------------
   u_sync : sync
     port map (
       clock_in => clock_in,
